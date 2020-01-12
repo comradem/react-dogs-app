@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {withRouter}  from 'react-router'
 
 class AboutPage extends Component {
     render() {
@@ -10,4 +11,4 @@ class AboutPage extends Component {
     }
 }
 
-export default AboutPage;
+export default withRouter(AboutPage);
