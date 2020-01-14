@@ -6,9 +6,9 @@ class Breed extends Component {
         return (
             <Card style={{ width: '18rem' }}>
                 <Card.Body>
-                    <Card.Title>Card Title</Card.Title>
+                    <Card.Title>{this.props.breed}</Card.Title>
                 </Card.Body>
-                <Card.Img variant="top" src="holder.js/100px180" />
+                <Card.Img variant="top" src={this.props.breed} />
             </Card>
         );
     }

@@ -7,14 +7,38 @@ import FormControl from 'react-bootstrap/FormControl';
 import Button from "react-bootstrap/Button";
 import Breed from "../components/Breed";
 import {withRouter} from 'react-router'
+import axios from 'axios';
+import '../utils/rest-utils'
+import {test, test2} from "../utils/rest-utils";
 
 class BreedsPage extends Component {
 
-    updateGallery = () => {
+    constructor(props) {
+        super(props);
 
+        this.state = {
+            allBreeds: []
+        }
+    }
+
+
+    updateGallery = async () => {
+        const resp = await axios.get(process.env.REACT_APP_ALL_DOGS);
+        let ans = [];
+        if (resp.data.status === 'success') {
+            const arr = Object.keys(resp.data.message);
+            const doggies = arr.map(item => axios.get(`${process.env.REACT_APP_DOGS_API}${item}${process.env.REACT_APP_DOGS_IMAGES_RND}`));
+            ans = await Promise.all(doggies);
+        }
+        this.setState({allBreeds: ans})
     };
 
+
     render() {
+        let arr = this.state.allBreeds.map(item => {
+            console.log(item);
+            // <Breed data={item}/>
+        });
         return (
             <Container>
                 <Navbar bg="light" variant="light">
@@ -35,12 +59,7 @@ class BreedsPage extends Component {
                     </InputGroup.Append>
                 </InputGroup>
                 <div>
-                    <Breed/>
-                    <Breed/>
-                    <Breed/>
-                    <Breed/>
-                    <Breed/>
-                    <Breed/>
+                    {arr}
                 </div>
             </Container>
         );
