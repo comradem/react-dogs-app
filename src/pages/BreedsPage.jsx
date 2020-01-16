@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
+import Row from 'react-bootstrap/Row'
 import Container from 'react-bootstrap/Container';
 import InputGroup from "react-bootstrap/InputGroup";
 import FormControl from 'react-bootstrap/FormControl';
@@ -9,7 +10,6 @@ import Breed from "../components/Breed";
 import {withRouter} from 'react-router'
 import axios from 'axios';
 import '../utils/rest-utils'
-import {test, test2} from "../utils/rest-utils";
 
 class BreedsPage extends Component {
 
@@ -17,28 +17,48 @@ class BreedsPage extends Component {
         super(props);
 
         this.state = {
-            allBreeds: []
+            data: [],
+            breeds: [],
+            specificClicked: false
         }
     }
 
 
     updateGallery = async () => {
+        //get all breeds names
         const resp = await axios.get(process.env.REACT_APP_ALL_DOGS);
         let ans = [];
+        let arr = [];
         if (resp.data.status === 'success') {
-            const arr = Object.keys(resp.data.message);
+            arr = Object.keys(resp.data.message);
             const doggies = arr.map(item => axios.get(`${process.env.REACT_APP_DOGS_API}${item}${process.env.REACT_APP_DOGS_IMAGES_RND}`));
             ans = await Promise.all(doggies);
         }
-        this.setState({allBreeds: ans})
+        this.setState({
+            data: ans,
+            breeds: arr,
+            specificClicked: false
+        })
     };
 
 
+    openSpecific = async (event) => {
+        const { history } = this.props;
+        let image = event.target.getAttribute('src');
+        console.log(image);
+        if(history) this.props.history.push({
+            pathname: '/breed',
+            state: {link:event.target.getAttribute('src')}});
+    };
+
     render() {
-        let arr = this.state.allBreeds.map(item => {
-            console.log(item);
-            // <Breed data={item}/>
+
+        let arr =[];
+        arr = this.state.data.map((item, index) => {
+            return <Breed key={index} image={item.data.message} title={item.data.message.split("/")[4]}
+                          clicked={this.openSpecific}/>
         });
+
         return (
             <Container>
                 <Navbar bg="light" variant="light">
@@ -58,9 +78,9 @@ class BreedsPage extends Component {
                         <Button variant="outline-secondary" onClick={this.updateGallery}>Update images</Button>
                     </InputGroup.Append>
                 </InputGroup>
-                <div>
+                <Row>
                     {arr}
-                </div>
+                </Row>
             </Container>
         );
     }
